@@ -22,10 +22,16 @@ case "$ARCH" in
 esac
 
 VERSION="${1:-latest}"
-if [[ "$VERSION" == "latest" ]]; then
-  VERSION="$(curl -fsSL https://api.github.com/repos/$REPO/releases/latest \
-    | grep -oE '\"tag_name\":\s*\"[^\"]+\"' | cut -d '\"' -f4)"
+if [[ "$VERSION" = "latest" ]]; then
+  # Preferência: jq (se existir); fallback para sed
+  if command -v jq >/dev/null 2>&1; then
+    VERSION="$(curl -fsSL "https://api.github.com/repos/$REPO/releases/latest" | jq -r .tag_name)"
+  else
+    VERSION="$(curl -fsSL "https://api.github.com/repos/$REPO/releases/latest" \
+      | sed -n 's/.*"tag_name":[[:space:]]*"\([^"]*\)".*/\1/p')"
+  fi
 fi
+
 
 ASSET="${BIN}-${OS_TAG}-${ARCH_TAG}"
 URL="https://github.com/${REPO}/releases/download/${VERSION}/${ASSET}"
