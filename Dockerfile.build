@@ -1,0 +1,9 @@
+FROM dart:stable AS build
+WORKDIR /app
+COPY pubspec.* ./
+RUN dart pub get
+COPY . .
+RUN dart compile exe bin/xpoz.dart -o /app/dist/xpoz-linux-amd64
+
+FROM scratch AS export
+COPY --from=build /app/dist/xpoz-linux-amd64 /xpoz-linux-amd64
