@@ -4,7 +4,6 @@ import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
 
-import 'package:http/http.dart' as http;
 import 'package:xpoz_cli/core/heart_beat.dart';
 import 'package:xpoz_cli/core/http_proxy.dart';
 import 'package:xpoz_cli/net/ws_transport.dart';
@@ -14,7 +13,6 @@ class TunnelClient {
   final String serverUrl;
   final int localPort;
   bool _isConnected = false;
-  final http.Client _httpClient = http.Client();
 
   late final WsTransport _ws;
   late final HeartBeat _hb;
@@ -91,7 +89,6 @@ class TunnelClient {
 
   void _cleanup() {
     _isConnected = false;
-    _httpClient.close();
     _ws.close();
   }
 }

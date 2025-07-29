@@ -21,7 +21,6 @@ jobs:
           - os: macos-latest
             os_tag: darwin
             arch_tag: arm64
-          # Se quiser macOS Intel, precisa de runner Intel (nem sempre disponível).
 
     steps:
       - uses: actions/checkout@v4
