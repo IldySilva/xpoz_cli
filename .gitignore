@@ -3,3 +3,5 @@
 .dart_tool/
 dist/
 *.DS_Store
+
+Dockerfile.build
