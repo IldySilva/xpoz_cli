@@ -1,0 +1,55 @@
+name: release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    name: Build matrix
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            os_tag: linux
+            arch_tag: amd64
+          - os: ubuntu-latest
+            os_tag: linux
+            arch_tag: arm64
+          - os: macos-latest
+            os_tag: darwin
+            arch_tag: arm64
+          # Se quiser macOS Intel, precisa de runner Intel (nem sempre disponível).
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+
+      - name: Pub get
+        run: dart pub get
+
+      - name: Build
+        run: dart compile exe bin/xpoz.dart -o dist/xpoz-${{ matrix.os_tag }}-${{ matrix.arch_tag }}
+
+      - name: Checksums
+        run: |
+          cd dist
+          if command -v sha256sum >/dev/null; then
+            sha256sum * > checksums-${{ matrix.os_tag }}-${{ matrix.arch_tag }}.txt
+          else
+            shasum -a 256 * > checksums-${{ matrix.os_tag }}-${{ matrix.arch_tag }}.txt
+          fi
+
+      - name: Upload artifacts to release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/xpoz-${{ matrix.os_tag }}-${{ matrix.arch_tag }}
+            dist/checksums-${{ matrix.os_tag }}-${{ matrix.arch_tag }}.txt
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
