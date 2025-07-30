@@ -1,66 +1,101 @@
-name: Release
+name: Build Multi-platform Binaries
 
 on:
-  # Dispara quando você cria/pusha uma tag começando com v
   push:
     tags:
       - 'v*'
     branches:
-      - 'master'
-  # Dispara quando publica uma Release pelo UI
-  release:
-    types: [published]
-  # Permite rodar manualmente na aba Actions
+      - master
+
+  pull_request:
+    branches: [ main ]
   workflow_dispatch:
 
-# Permissões necessárias para criar/adicionar assets na Release
-permissions:
-  contents: write
-
 jobs:
-  build:
-    name: Build matrix
-    runs-on: ${{ matrix.os }}
+  build-linux:
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        include:
-          - os: ubuntu-latest
-            os_tag: linux
-            arch_tag: amd64
-          - os: ubuntu-latest
-            os_tag: linux
-            arch_tag: arm64
-          - os: macos-latest
-            os_tag: darwin
-            arch_tag: arm64
-
+        arch: [amd64, arm64]
+    
     steps:
-      - uses: actions/checkout@v4
+    - uses: actions/checkout@v4
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+    
+    - name: Build Linux ${{ matrix.arch }}
+      run: |
+        if [ "${{ matrix.arch }}" = "amd64" ]; then
+          make build-linux
+        else
+          make build-linux-arm64
+        fi
+    
+    - name: Upload Linux ${{ matrix.arch }} artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: xpoz-linux-${{ matrix.arch }}
+        path: dist/xpoz-linux-${{ matrix.arch }}
 
-      - uses: dart-lang/setup-dart@v1
-        with:
-          sdk: stable
+  build-macos:
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        arch: [arm64, amd64]
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Dart
+      uses: dart-lang/setup-dart@v1
+      with:
+        sdk: stable
+    
+    - name: Build macOS ${{ matrix.arch }}
+      run: |
+        mkdir -p dist
+        if [ "${{ matrix.arch }}" = "arm64" ]; then
+          make build-mac-arm64
+        else
+          make build-mac-amd64
+        fi
+    
+    - name: Upload macOS ${{ matrix.arch }} artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: xpoz-darwin-${{ matrix.arch }}
+        path: dist/xpoz-darwin-${{ matrix.arch }}
 
-      - name: Pub get
-        run: dart pub get
-
-      - name: Build
-        run: dart compile exe bin/xpoz.dart -o dist/xpoz-${{ matrix.os_tag }}-${{ matrix.arch_tag }}
-
-      - name: Checksums
-        run: |
-          cd dist
-          if command -v sha256sum >/dev/null; then
-            sha256sum * > checksums-${{ matrix.os_tag }}-${{ matrix.arch_tag }}.txt
-          else
-            shasum -a 256 * > checksums-${{ matrix.os_tag }}-${{ matrix.arch_tag }}.txt
-          fi
-
-      - name: Upload to GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: |
-            dist/xpoz-${{ matrix.os_tag }}-${{ matrix.arch_tag }}
-            dist/checksums-${{ matrix.os_tag }}-${{ matrix.arch_tag }}.txt
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  create-release:
+    needs: [build-linux, build-macos]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Download all artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: dist/
+        merge-multiple: true
+    
+    - name: Generate checksums
+      run: |
+        cd dist
+        sha256sum * > checksums.txt
+        ls -la
+    
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          dist/xpoz-linux-amd64
+          dist/xpoz-linux-arm64
+          dist/xpoz-darwin-arm64
+          dist/xpoz-darwin-amd64
+          dist/checksums.txt
+        generate_release_notes: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
