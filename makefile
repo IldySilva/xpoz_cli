@@ -37,7 +37,7 @@ build-mac-arm64: ## Compila para macOS ARM64 (Apple Silicon)
 	@echo "🍎 Compilando para macOS ARM64..."
 	@if [ "$$(uname)" = "Darwin" ]; then \
 		dart pub get; \
-		dart compile exe bin/main.dart -o $(DIST)/$(APP_NAME)-darwin-arm64; \
+		dart compile exe bin/xpoz.dart -o $(DIST)/$(APP_NAME)-darwin-arm64; \
 		chmod +x $(DIST)/$(APP_NAME)-darwin-arm64; \
 		echo "✅ macOS ARM64 build concluído"; \
 	else \
@@ -50,7 +50,7 @@ build-mac-amd64: ## Compila para macOS AMD64 (Intel)
 	@echo "🍎 Compilando para macOS AMD64..."
 	@if [ "$$(uname)" = "Darwin" ]; then \
 		dart pub get; \
-		dart compile exe bin/main.dart -o $(DIST)/$(APP_NAME)-darwin-amd64; \
+		dart compile exe bin/xpoz.dart -o $(DIST)/$(APP_NAME)-darwin-amd64; \
 		chmod +x $(DIST)/$(APP_NAME)-darwin-amd64; \
 		echo "✅ macOS AMD64 build concluído"; \
 	else \
@@ -109,7 +109,7 @@ info: ## Mostra informações do sistema e ferramentas
 dev-build: ## Build rápido para desenvolvimento (plataforma atual)
 	@echo "🔧 Build de desenvolvimento..."
 	dart pub get
-	dart compile exe bin/main.dart -o $(DIST)/$(APP_NAME)-dev
+	dart compile exe bin/xpoz.dart -o $(DIST)/$(APP_NAME)-dev
 	chmod +x $(DIST)/$(APP_NAME)-dev
 	@echo "✅ Build de desenvolvimento concluído: $(DIST)/$(APP_NAME)-dev"
 
