@@ -30,9 +30,9 @@ RUN echo "Building on $BUILDPLATFORM for $TARGETPLATFORM"
 RUN if [ "$TARGETPLATFORM" = "linux/arm64" ]; then \
         export CC=aarch64-linux-gnu-gcc && \
         export CXX=aarch64-linux-gnu-g++ && \
-        dart compile exe bin/main.dart -o /xpoz-linux-amd64; \
+        dart compile exe bin/xpoz.dart -o /xpoz-linux-amd64; \
     else \
-        dart compile exe bin/main.dart -o /xpoz-linux-amd64; \
+        dart compile exe bin/xpoz.dart -o /xpoz-linux-amd64; \
     fi
 
 # Verificar o binário gerado
