@@ -1,9 +1,21 @@
-name: release
+name: Release
 
 on:
+  # Dispara quando você cria/pusha uma tag começando com v
   push:
     tags:
       - 'v*'
+    branches:
+      - 'master'
+  # Dispara quando publica uma Release pelo UI
+  release:
+    types: [published]
+  # Permite rodar manualmente na aba Actions
+  workflow_dispatch:
+
+# Permissões necessárias para criar/adicionar assets na Release
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -44,7 +56,7 @@ jobs:
             shasum -a 256 * > checksums-${{ matrix.os_tag }}-${{ matrix.arch_tag }}.txt
           fi
 
-      - name: Upload artifacts to release
+      - name: Upload to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           files: |
