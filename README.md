@@ -3,11 +3,6 @@
 Expose your local apps to the internet securely with a single command.
 
 ------------------------------------------------------------
-BADGES (optional):
-[Build Status] [Latest Release] [License] [Downloads]
-------------------------------------------------------------
-
-## TL;DR
 
 Install:
   curl -fsSL https://get.xpoz.xyz/install.sh | bash
@@ -26,15 +21,15 @@ That’s it. You’ll get a public URL that forwards to http://localhost:3000.
 - 🎯 Stable subdomains (server‑assigned)
 - 📡 Full HTTP proxy support (headers, body, binary)
 - 🔁 Auto reconnect with backoff + heartbeat
-- 🚦 Concurrency limit to protect your machine
-- 🧩 Config file & flags (server, token, limits)
-- 🧰 Cross‑platform (macOS / Linux)
 
 Planned:
 - 🧪 Preview URLs from branches/PRs (Git‑first)
 - 🛡️ Auth tokens & ACLs
 - 📈 Dashboard and metrics
 - 🔌 VS Code / JetBrains integrations
+- 🚦 Concurrency limit to protect your machine
+- 🧩 Config file & flags (server, token, limits)
+- 🧰 Cross‑platform (macOS / Linux)
 
 ------------------------------------------------------------
 
