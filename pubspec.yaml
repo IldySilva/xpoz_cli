@@ -4,7 +4,7 @@ version: 1.0.0
 repository: https://github.com/ildysilva/xpoz_cli
 
 environment:
-  sdk: ^3.8.1
+  sdk: ^3.8.2
 
 # Add regular dependencies here.
 dependencies:
