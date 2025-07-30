@@ -6,7 +6,6 @@ on:
       - 'v*'
     branches:
       - master
-
   pull_request:
     branches: [ main ]
   workflow_dispatch:
@@ -19,7 +18,8 @@ jobs:
         arch: [amd64, arm64]
     
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v4
     
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
@@ -37,6 +37,7 @@ jobs:
       with:
         name: xpoz-linux-${{ matrix.arch }}
         path: dist/xpoz-linux-${{ matrix.arch }}
+        retention-days: 7
 
   build-macos:
     runs-on: macos-latest
@@ -45,7 +46,8 @@ jobs:
         arch: [arm64, amd64]
     
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v4
     
     - name: Setup Dart
       uses: dart-lang/setup-dart@v1
@@ -54,7 +56,6 @@ jobs:
     
     - name: Build macOS ${{ matrix.arch }}
       run: |
-        mkdir -p dist
         if [ "${{ matrix.arch }}" = "arm64" ]; then
           make build-mac-arm64
         else
@@ -66,6 +67,7 @@ jobs:
       with:
         name: xpoz-darwin-${{ matrix.arch }}
         path: dist/xpoz-darwin-${{ matrix.arch }}
+        retention-days: 7
 
   create-release:
     needs: [build-linux, build-macos]
@@ -73,21 +75,32 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/')
     
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Create dist directory
+      run: mkdir -p dist
     
     - name: Download all artifacts
       uses: actions/download-artifact@v4
       with:
-        path: dist/
-        merge-multiple: true
+        path: artifacts/
     
-    - name: Generate checksums
+    - name: Move binaries to dist/
       run: |
-        cd dist
-        sha256sum * > checksums.txt
-        ls -la
+        # Mover cada binário para dist/ com nome correto
+        cp artifacts/xpoz-linux-amd64/xpoz-linux-amd64 dist/
+        cp artifacts/xpoz-linux-arm64/xpoz-linux-arm64 dist/
+        cp artifacts/xpoz-darwin-arm64/xpoz-darwin-arm64 dist/
+        cp artifacts/xpoz-darwin-amd64/xpoz-darwin-amd64 dist/
+        
+        # Verificar arquivos
+        ls -la dist/
+        
+        # Gerar checksums
+        cd dist && sha256sum * > checksums.txt
     
-    - name: Create Release
+    - name: Create GitHub Release
       uses: softprops/action-gh-release@v1
       with:
         files: |
@@ -97,5 +110,34 @@ jobs:
           dist/xpoz-darwin-amd64
           dist/checksums.txt
         generate_release_notes: true
+        draft: false
+        prerelease: false
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # Job adicional para testar builds em PRs
+  test-builds:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Dart
+      uses: dart-lang/setup-dart@v1
+      with:
+        sdk: stable
+    
+    - name: Test local build
+      run: |
+        make dev
+        ls -la dist/
+        file dist/xpoz-dev
+    
+    - name: Test Linux build
+      run: |
+        make clean
+        make build-linux
+        ls -la dist/
+        file dist/xpoz-linux-amd64
