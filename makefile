@@ -54,7 +54,7 @@ build-mac-amd64: ## Compila para macOS AMD64 → dist/xpoz-darwin-amd64
 
 build-mac: build-mac-arm64 build-mac-amd64 ## Compila ambos macOS
 
-build-all: clean build-linux build-linux-arm64 build-mac ## Compila Linux (AMD64 + ARM64)
+build-all: clean build-linux build-linux-arm64 ## Compila Linux (AMD64 + ARM64)
 	@echo ""
 	@echo "🎉 Build completo! Arquivos criados:"
 	@ls -la $(DIST)/
