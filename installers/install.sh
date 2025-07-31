@@ -60,4 +60,4 @@ else
 fi
 
 echo "✅ Installed: $(command -v $BIN)"
-$BIN --version || true
+$BIN version || true
