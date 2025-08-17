@@ -5,7 +5,7 @@ Expose your local apps to the internet securely with a single command.
 ------------------------------------------------------------
 
 Install:
-  ```curl -fsSL https://get.xpoz.xyz/install.sh | bash```
+  ```bash curl -fsSL https://cli.xpoz.xyz/install.sh | bash```
 
 Expose a local app:
   xpoz expose http 3000
