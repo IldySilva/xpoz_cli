@@ -1,0 +1,74 @@
+site_name: Xpoz CLI
+site_description: Secure and instant local tunneling
+site_url: https://docs.xpoz.xyz 
+
+
+repo_name: ildysilva/xpoz_cli
+repo_url: https://github.com/ildysilva/xpoz_cli
+
+# Theme configuration
+theme:
+  name: material
+  logo: assets/logo.png
+  favicon: assets/favicon.ico
+  palette:
+      # Dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: blue
+      accent: blue
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+    # Light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: blue
+      accent: blue
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+
+  
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.highlight
+    - search.share
+    - content.code.copy
+
+# Extensions
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - admonition
+  - pymdownx.details
+  - pymdownx.tabbed:
+      alternate_style: true
+  - attr_list
+  - md_in_html
+
+# Navigation structure
+nav:
+  - Home: index.md
+  - Getting Started:
+    - Installation: getting-started/installation.md
+    - Quick Start: getting-started/quick-start.md
+  - Usage:
+    - Basic Commands: usage/commands.md
+    - Configuration: usage/configuration.md
+  - Advanced:
+    - Self-Hosting: advanced/self-hosting.md
+    - Troubleshooting: advanced/troubleshooting.md
+  - About:
+    - Roadmap: about/roadmap.md
+    - License: about/license.md
+
+# Search
+plugins:
+  - search
